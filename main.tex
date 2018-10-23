@@ -27,7 +27,7 @@
 
 \title{How Factor Drive\texttrademark Works}
 \author[Hugh Winkler]{Hugh Winkler}
-\date{25 September 2018}  % if the \date{} command is left out, the current date will be used
+\date{23 October 2018}  % if the \date{} command is left out, the current date will be used
 
 % The following package makes prettier tables.  We're all about the bling!
 \usepackage{booktabs}
@@ -62,20 +62,66 @@
 \maketitle% this prints the handout title, author, and date
 
 \begin{abstract}
-\noindent This document describes the concepts underlying Factor Drive\texttrademark. 
+\noindent
+Factor Drive\texttrademark solves the geosteering problem probabilistically.
+It models everything in the system as random variables, and then  
+calculate the probability of each possible configuration of those variables.
 \end{abstract}
 
 %\printclassoptions
 
-Factor Drive\texttrademark solves the geosteering problem probabilistically.
-We model everything in the system as random variables, and then find 
-calculate the probability of each possible configuration of those variables.
+
+
+\section{How It Doesn't Work}\label{sec:how-it-doesnt-work}
+Let's dispose of a misleading idea. 
+Factor Drive\texttrademark doesn't simulate the way people use a conventional geosteering program.
+It doesn't try a lot of different geologic structures and wellbore trajectories, selecting
+the configuration that gives the best correlation between the type log and the MWD gamma ray. The
+interpretation that gives the best
+correlation may not be the most likely one.
+Correlation is a good guide. Under many common circumstances it does give you the best
+interpretation. But the assumptions it requires aren't broad enough to support using
+it to compute an interpretation.
+Correlation can fail if there are ambiguous, nearly identical features on the log; a fault can cause a misleading alignment. Mathematically, we'd say that the "best correlation" rule fails because the variables you're optimizing aren't normally distributed.
+
+Geologists know how to work around these limitations. They overrule the numbers whenever geologic or engineering sense dictates. Factor Drive\texttrademark captures those heuristics as probability distributions.
+
+\section{How It Works}\label{sec:how-it-doesnt-work}
+\subsection{The Fundamental Problem of Geosteering}\label{sec:fundamental-problem}
+
+\begin{marginfigure}
+  \includegraphics{which-depth-for-155-gapi.png}
+  \caption{This gamma ray type log touches near 155 gAPI at three separate depths.}
+  \label{fig:which-depth-for-155-gapi}
+\end{marginfigure}
+
+The fundamental problem of geosteering is: given a log reading while drilling, what stratigraphic depth did it come from?
+
+If you only knew that a GR reading of 155 gAPI came from somewhere in the depth range on figure
+\ref{fig:which-depth-for-155-gapi}, you'd know that the reading probably came from one of the three depths where the log reaches that value. By "probably", we mean we can represent that knowledge by a
+probability distribution, as in figure \ref{fig:probability-density-for-155-gapi}. 
+
+
+
+
+
+
 Just consider a few positions along a lateral wellbore, as in figure~\ref{fig:random-vars-lateral} . We'll work in
 two dimensions, to make life easy. At each position,
 think of these quantities as random variables: the spatial location
 of the position, and the depth of the geologic structure at that position's lateral location.
 These are the quantities we want to know. Since they are random variables, we'll describe the
 answers as probability distributions. 
+
+
+\begin{marginfigure}
+  \includegraphics{probability-density-for-155-gapi.png}
+  \caption{The probability that a log reading of 155 gAPI came from any particular depth.}
+  \label{fig:probability-density-for-155-gapi}
+\end{marginfigure}
+
+
+
 So to visualize the computed probability for the wellbore position's spatial location,
 imagine a hill rising out of the (depth, lateral) plane. The peak of the hill occurs at the
 most likely value of the wellbore's spatial location, but the other points on the plane where
