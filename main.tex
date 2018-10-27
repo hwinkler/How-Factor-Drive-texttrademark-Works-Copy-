@@ -72,13 +72,22 @@ calculates the probability of each possible configuration of those variables.
 
 In 2017 I published an article\cite{Winkler2017}  describing a way to
 compute a geosteering interpretation. The core concept is that
-you have to conceive of the geosteering problem as a geophysical inverse 
-problem having a probabilistic answer. That's the only way you can compute all the
+you have to conceive of the geosteering problem as a
+problem having probabilistic inputs and a probabilistic answer. 
+That's the only way you can compute all the
 possible geologic structures and wellbore trajectories that could explain the log
 and survey measurements.
+The inputs are log and survey measurements that have uncertainty,
+along with your uncertain geologic knowledge about the region you're drilling.
+For "uncertain" you can read "described by a probability distribution".
+For example, think of a survey measurement of 89\textdegree $\pm$ 0.25\textdegree 
+as a probability distribution with mean 89\textdegree and standard deviation 
+0.25\textdegree.
+The outputs are estimates of the geologic structure and the well position;
+again, the 
 
 That article employs Bayesian networks to formulate and solve the probabilistic problem, but you
-don't need to understand Bayesian networks to understand the probabilistic concepts and to get
+don't need to understand Bayesian networks to understand the probabilistic concepts and to gethttps://www.overleaf.com/project/5bce2dd2ae64757083288f18
 a feeling for how Factor Drive works. 
 
 \section{How It Doesn't Work}\label{sec:how-it-doesnt-work}
@@ -101,7 +110,7 @@ Geologists know how to work around these limitations. They use correlation as a 
 \section{How It Works}\label{sec:how-it-doesnt-work}
 \subsection{The Fundamental Problem of Geosteering}\label{sec:fundamental-problem}
 
-Given a log reading while drilling, what stratigraphic depth did it come from? I call that question the 
+Given a log value while drilling, what stratigraphic depth did it come from? That is the 
 fundamental problem of geosteering. The answer to that question gives you the key piece of information you need
 to estimate the true geologic structure depth and wellbore position.
 
@@ -119,12 +128,17 @@ probability distribution, as in figure \ref{fig:probability-density-for-155-gapi
 builds a probability distribution like this one for every MWD measurement.
 
 But we have more information (figure \ref{fig:neighboring-stations}). We have estimates for the wellbore depth and the structure depth 
-at the previous survey position; we have surveys at the beginning and end of that segment; and we know some constraints on the range of possible geologic dip and wellbore curvature in that interval. Before running a computation, you tell Factor Drive a regional dip, or you give it a structure description; along with that, you specify an uncertainty, in degrees of dip, that allows the algorithm some wiggle room. You also specify, in degrees of inclination, the uncertainty in the directional surveys. The minimum curvature rule gives a good first estimate of the change in well position between
+at the previous survey position; we have surveys at the beginning and end of that segment; and we know
+some constraints on the range of possible geologic dip and wellbore curvature in that interval. Before
+running a computation, you tell Factor Drive a regional dip, or you give it a structure description;
+along with that, you specify an uncertainty, in degrees of dip, that allows the algorithm some wiggle
+room. You also specify, in degrees of inclination, the uncertainty in the directional surveys. The
+minimum curvature rule gives a good first estimate of the change in well position between
 the ends of the segment, but small survey errors can cause significant departures from that estimate.
-In fact, depending on the actions of the driller, the shape of the wellbore may not follow a circle: it 
+In fact, the shape of the wellbore may not trace the minimum curvature arc of a circle: it 
 may have a series of scalloped shapes as the driller slides and rotates to build curve. 
 
-\begin{marginfigure}[-2in]
+\begin{marginfigure}
   \includegraphics{so-you-adjust-your-probability.png}
    \caption{Our knowledge about the local dip and how much pipe can bend across a short interval 
   modifies the probability from figure \ref{fig:probability-density-for-155-gapi}}.
@@ -132,7 +146,9 @@ may have a series of scalloped shapes as the driller slides and rotates to build
 \end{marginfigure}
 
 All of that other information causes us to adjust our original probability for the 
-depth (figure \ref{fig:so-you-adjust-your-probability}).
+depth. Factor Drive multiplies the probability functions together to modify the original
+probability of figure \ref{fig:probability-density-for-155-gapi}. In figure \ref{fig:so-you-adjust-your-probability}, the additional information causes us to favor
+the choice of 7000' as the most probable stratigraphic depth.
 
 \begin{figure*}
     \includegraphics[width=\linewidth]{neighboring-stations.png}
