@@ -72,23 +72,29 @@ calculates the probability of each possible configuration of those variables.
 
 In 2017 I published an article\cite{Winkler2017}  describing a way to
 compute a geosteering interpretation. The core concept is that
-you have to conceive of the geosteering problem as a
-problem having probabilistic inputs and a probabilistic answer. 
+you have to conceive of the geosteering problem as having probabilistic inputs and a probabilistic answer. 
 That's the only way you can compute all the
 possible geologic structures and wellbore trajectories that could explain the log
 and survey measurements.
-The inputs are log and survey measurements that have uncertainty,
-along with your uncertain geologic knowledge about the region you're drilling.
-For "uncertain" you can read "described by a probability distribution".
-For example, think of a survey measurement of 89\textdegree $\pm$ 0.25\textdegree 
-as a probability distribution with mean 89\textdegree and standard deviation 
-0.25\textdegree.
-The outputs are estimates of the geologic structure and the well position;
-again, the 
-
-That article employs Bayesian networks to formulate and solve the probabilistic problem, but you
-don't need to understand Bayesian networks to understand the probabilistic concepts and to gethttps://www.overleaf.com/project/5bce2dd2ae64757083288f18
+The article employs Bayesian networks to formulate and solve the probabilistic problem, but you
+don't need to understand Bayesian networks to understand the probabilistic concepts and to get
 a feeling for how Factor Drive works. 
+
+The inputs to the geosteering problem are log and survey measurements that have uncertainty,
+along with your uncertain geologic knowledge about the region you're drilling, and
+an approximate engineering model for the shape of the wellbore.
+We want to  discover the most probable geologic structure and 
+the well position, while recognizing that other answers are possible. So there's 
+uncertainty in the output as well.
+
+For "uncertain" you can read "described by a probability distribution".
+Think of a survey measurement of 89\textdegree $\pm$ 0.25\textdegree 
+as a probability distribution with mean 89\textdegree and standard deviation 
+0.25\textdegree. And think of the answers, estimates of the geologic structure and 
+the well position, as probability distributions too. There's a most likely
+configuration of these quantities, but there's a confidence measure around those answers too. 
+This is what I mean by "conceive of the geosteering problem as having probabilistic 
+inputs and a probabilistic answer".
 
 \section{How It Doesn't Work}\label{sec:how-it-doesnt-work}
 Factor Drive doesn't simulate the way people use a conventional geosteering program.
@@ -127,6 +133,17 @@ If the only thing you know is that a GR reading of 155 gAPI came from somewhere 
 probability distribution, as in figure \ref{fig:probability-density-for-155-gapi}. Factor Drive 
 builds a probability distribution like this one for every MWD measurement.
 
+
+\begin{figure*}
+    \includegraphics[width=\linewidth]{neighboring-stations.png}
+    \caption{If we have estimates for the wellbore position and the structure depth at a previous
+    position (8000 MD), then we combine the probabilities describing the dip, the faulting, and the
+    change in wellbore position, with the probability for the stratigraphic depth from 
+    \ref{fig:probability-density-for-155-gapi}, to estimate the wellbore position and
+    structure depth at the current position (8096 MD).}
+    \label{fig:neighboring-stations}
+\end{figure*}
+
 But we have more information (figure \ref{fig:neighboring-stations}). We have estimates for the wellbore depth and the structure depth 
 at the previous survey position; we have surveys at the beginning and end of that segment; and we know
 some constraints on the range of possible geologic dip and wellbore curvature in that interval. Before
@@ -150,13 +167,6 @@ depth. Factor Drive multiplies the probability functions together to modify the 
 probability of figure \ref{fig:probability-density-for-155-gapi}. In figure \ref{fig:so-you-adjust-your-probability}, the additional information causes us to favor
 the choice of 7000' as the most probable stratigraphic depth.
 
-\begin{figure*}
-    \includegraphics[width=\linewidth]{neighboring-stations.png}
-    \caption{If we have estimates for the wellbore position and the structure depth at a previous
-    position, then combining the probabilities describing the dip, the faulting, and the }.
-    \label{fig:neighboring-stations}
-\end{figure*}
-
 % \begin{figure}[h]
 %     \includegraphics[width=\linewidth]{neighboring-stations.png}
 %     \caption{If we have estimates for the wellbore position and the structure depth at a previous
@@ -169,9 +179,12 @@ New log and survey measurements at the bit can can shed light on what's going on
 well position, so we have to combine all the probabilities of all those variables (dip, fault,
 inclination, and a few more we haven't mentioned), at all positions along the wellbore, to get
 an updated overall picture of the joint probability (figure \ref{fig:the-answer}).
-In practice, Factor Drive subdivides the trajectory into short (typically four foot) segments,
-much shorter than the usual 96-foot drill pipe stand length, so it has a set of those
-variables for each segment.
+In practice, Factor Drive subdivides the trajectory into short segments,
+much shorter than the usual 96-foot drill pipe stand length; it has a set of those
+probabilities for each segment. For each new measurement at the bit, it has to multiply 
+all of those thousands of probability functions together. It's an impossible computation, if
+you approach it naively. It would require more bytes of computer memory than there are
+atoms in the universe.
 
 \begin{figure*}[h]
     \includegraphics[width=\linewidth]{the-answer.png}
@@ -183,7 +196,14 @@ variables for each segment.
     \label{fig:the-answer}
 \end{figure*}
 
-
+The Bayesian network is simply a way to reduce the size of that computation. 
+Bayesian networks arrange those probability functions into a graph that recognizes
+the dependencies among them. By using the network to guide the order in which you multiply
+and sum the probabilities, you never have to hold more than a handful of probability 
+functions in computer memory at any one time. Factor Drive's innovation is that we designed
+a network specifically for the geosteering problem that enables the computation to run
+on the kinds of computers available today, quickly enough to give you answers in the
+time it takes to drill a stand of pipe.
 
 \bibliography{sample-handout}
 \bibliographystyle{plainnat}
