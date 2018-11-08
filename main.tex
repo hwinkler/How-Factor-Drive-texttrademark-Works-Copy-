@@ -167,13 +167,15 @@ depth. Factor Drive multiplies the probability functions together to modify the 
 probability of figure \ref{fig:probability-density-for-155-gapi}. In figure \ref{fig:so-you-adjust-your-probability}, the additional information causes us to favor
 the choice of 7000' as the most probable stratigraphic depth.
 
-% \begin{figure}[h]
-%     \includegraphics[width=\linewidth]{neighboring-stations.png}
-%     \caption{If we have estimates for the wellbore position and the structure depth at a previous
-%     position, then combining the probabilities describing the dip, the faulting, and the }.
-%     \label{fig:neighboring-stations}
-%     \setfloatalignment{b}
-% \end{figure}
+\begin{figure*}[h]
+    \includegraphics[width=\linewidth]{the-answer.png}
+    \caption{
+    The final geosteering answer must account for all the probabilities and constraints
+    along the whole wellbore, simultaneously, to calculate the most likely structure and
+    wellbore trajectory.
+    }.
+    \label{fig:the-answer}
+\end{figure*}
 
 New log and survey measurements at the bit can can shed light on what's going on hundreds or thousands of feet back. We're looking for the overall most likely combination of structure and
 well position, so we have to combine all the probabilities of all those variables (dip, fault,
@@ -186,15 +188,6 @@ all of those thousands of probability functions together. It's an impossible com
 you approach it naively. It would require more bytes of computer memory than there are
 atoms in the universe.
 
-\begin{figure*}[h]
-    \includegraphics[width=\linewidth]{the-answer.png}
-    \caption{
-    The final geosteering answer must account for all the probabilities and constraints
-    along the whole wellbore, simultaneously, to calculate the most likely structure and
-    wellbore trajectory.
-    }.
-    \label{fig:the-answer}
-\end{figure*}
 
 The Bayesian network is simply a way to reduce the size of that computation. 
 Bayesian networks arrange those probability functions into a graph that recognizes
